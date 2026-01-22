@@ -37,9 +37,32 @@
 
         /* --- Components --- */
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .layout-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: -1;
+                /* Show sidebar on top on mobile? Or bottom? Let's keep existing flow or put sidebar on top for util access */
+            }
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 20px;
+            height: fit-content;
         }
 
         h1,
@@ -103,7 +126,7 @@
         header {
             text-align: center;
             margin-bottom: 40px;
-            padding-top: 40px;
+            padding-top: 20px;
         }
 
         header h1 {
@@ -197,7 +220,6 @@
             width: 4px;
             height: 16px;
             background-color: var(--google-blue);
-            /* Default */
             margin-right: 8px;
             border-radius: 2px;
         }
@@ -287,6 +309,107 @@
             opacity: 0.7;
         }
 
+        /* --- Widgets --- */
+        .widget-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .widget-title {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* Clock */
+        .digital-clock {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .date-display {
+            color: var(--text-secondary);
+            margin-top: -5px;
+            margin-bottom: 10px;
+        }
+
+        /* Stopwatch */
+        .stopwatch-display {
+            font-size: 2rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .btn {
+            background: var(--bg-color);
+            border: 1px solid #dadce0;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.1s;
+        }
+
+        .btn:hover {
+            background: #f1f3f4;
+        }
+
+        .btn-primary {
+            background: var(--google-blue);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #3367d6;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-danger {
+            color: #d93025;
+        }
+
+        /* Calendar */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .cal-day-name {
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .cal-day {
+            padding: 5px;
+            font-size: 0.9rem;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            line-height: 20px;
+            margin: 0 auto;
+        }
+
+        .cal-today {
+            background-color: var(--google-blue);
+            color: white;
+            font-weight: bold;
+        }
+
         /* --- Footer --- */
         footer {
             text-align: center;
@@ -309,510 +432,553 @@
             <p class="tracker-summary">Feb 1 — July 31 • <span id="total-progress">0%</span> Complete</p>
         </header>
 
-        <!-- recurring tasks -->
-        <div class="card">
-            <h2 class="month-header" style="border:none; margin-bottom: 20px;">
-                <span class="month-title">📅 Recurring Daily Schedule</span>
-            </h2>
-            <div class="daily-routine">
-                <div style="background: #e8f0fe; padding: 16px; border-radius: 8px;">
-                    <h3 style="color: #1967d2; margin-bottom: 12px;">Weekdays</h3>
-                    <div class="time-block">
-                        <span class="time-icon">🕕</span>
-                        <div class="time-text">
-                            <strong>7:00 PM – 9:30 PM</strong>
-                            <span>Focused Deep Work Block</span>
+        <div class="layout-grid">
+
+            <!-- MAIN CONTENT (Left) -->
+            <main class="main-content">
+
+                <!-- recurring tasks -->
+                <div class="card">
+                    <h2 class="month-header" style="border:none; margin-bottom: 20px;">
+                        <span class="month-title">📅 Recurring Daily Schedule</span>
+                    </h2>
+                    <div class="daily-routine">
+                        <div style="background: #e8f0fe; padding: 16px; border-radius: 8px;">
+                            <h3 style="color: #1967d2; margin-bottom: 12px;">Weekdays</h3>
+                            <div class="time-block">
+                                <span class="time-icon">🕕</span>
+                                <div class="time-text">
+                                    <strong>7:00 PM – 9:30 PM</strong>
+                                    <span>Focused Deep Work Block</span>
+                                </div>
+                            </div>
+                            <div class="task-list">
+                                <div class="task-item">🔹 30 min: Concept/Theory</div>
+                                <div class="task-item">🔹 90 min: 2 LeetCode Problems</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="task-list">
-                        <div class="task-item">🔹 30 min: Concept/Theory</div>
-                        <div class="task-item">🔹 90 min: 2 LeetCode Problems</div>
+                        <div style="background: #fce8e6; padding: 16px; border-radius: 8px;">
+                            <h3 style="color: #c5221f; margin-bottom: 12px;">Weekends</h3>
+                            <div class="time-block">
+                                <span class="time-icon">🕘</span>
+                                <div class="time-text">
+                                    <strong>10:00 AM – 2:00 PM</strong>
+                                    <span>Marathon Session</span>
+                                </div>
+                            </div>
+                            <div class="task-list">
+                                <div class="task-item">🔹 Deep Dive / Contest Prep</div>
+                                <div class="task-item">🔹 Review Weak Areas</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div style="background: #fce8e6; padding: 16px; border-radius: 8px;">
-                    <h3 style="color: #c5221f; margin-bottom: 12px;">Weekends</h3>
-                    <div class="time-block">
-                        <span class="time-icon">🕘</span>
-                        <div class="time-text">
-                            <strong>10:00 AM – 2:00 PM</strong>
-                            <span>Marathon Session</span>
-                        </div>
+
+                <!-- MONTH 1 -->
+                <div class="card month-green" id="month-1">
+                    <div class="month-header">
+                        <span class="month-title"><span class="tag green">Month 1</span> Feb: Foundations C++ & Basic
+                            DSA</span>
+                        <span class="progress-indicator">0/34 Tasks</span>
                     </div>
-                    <div class="task-list">
-                        <div class="task-item">🔹 Deep Dive / Contest Prep</div>
-                        <div class="task-item">🔹 Review Weak Areas</div>
+
+                    <div class="topic-group">
+                        <div class="topic-title">Week 1 (Feb 1-7): Arrays & Strings</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Study: C++ STL (vector, string, references)</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Two Sum</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Best Time to Buy/Sell Stock</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-4"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Valid Anagram</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-5"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Contains Duplicate</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-6"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Reverse String</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-7"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Goal Check: solved 14 problems total this week?</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Week 2 -->
+                    <div class="topic-group">
+                        <div class="topic-title">Week 2 (Feb 8-14): Hashing & Two Pointers</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Study: unordered_map, map, Sliding Window intro</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Longest Substring Without Repeating Characters</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Group Anagrams</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-4"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Valid Palindrome</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-5"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Two Sum II</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-6"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Goal Check: solved 15 problems total this week?</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Week 3 -->
+                    <div class="topic-group">
+                        <div class="topic-title">Week 3 (Feb 15-21): Sliding Window & Recursion</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w3-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Study: Time Complexity Deep Dive</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w3-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Goal Check: solved 15 problems total this week?</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Week 4 -->
+                    <div class="topic-group">
+                        <div class="topic-title">Week 4 (Feb 22-28): Revision</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w4-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Action: Re-solve old problems without looking</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w4-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Action: Fix weak areas identified</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w4-3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Goal Check: 10 re-solves completed?</div>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- MONTH 1 -->
-        <div class="card month-green" id="month-1">
-            <div class="month-header">
-                <span class="month-title"><span class="tag green">Month 1</span> Feb: Foundations C++ & Basic DSA</span>
-                <span class="progress-indicator">0/34 Tasks</span>
-            </div>
+                <!-- MONTH 2 -->
+                <div class="card month-green" id="month-2">
+                    <div class="month-header">
+                        <span class="month-title"><span class="tag green">Month 2</span> March: Intermediate DSA</span>
+                        <span class="progress-indicator">0/15 Tasks</span>
+                    </div>
+                    <div class="topic-group">
+                        <div class="topic-title">Week 1 (Mar 1-7): Linked List</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Reverse Linked List</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Detect Cycle</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Merge Two Sorted Lists</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-4"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Goal Check: 12 problems total</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="topic-group">
+                        <div class="topic-title">Week 2 (Mar 8-14): Stack & Queue</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Valid Parentheses</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Min Stack</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Daily Temperatures</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-4"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Goal Check: 12 problems total</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="topic-group">
+                        <div class="topic-title">Week 3 (Mar 15-21): Binary Search (⚠️ Important)</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Binary Search</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Search in Rotated Array</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Koko Eating Bananas</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-4"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Goal Check: 15 problems total</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="topic-group">
+                        <div class="topic-title">Week 4 (Mar 22-31): Trees (BFS/DFS)</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w4-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Study: Inorder/Preorder/Postorder, Level Order</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w4-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Max Depth of Binary Tree</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w4-3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Goal Check: 15 problems total</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-            <div class="topic-group">
-                <div class="topic-title">Week 1 (Feb 1-7): Arrays & Strings</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">Study: C++ STL (vector, string, references)</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Two Sum</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-3"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Best Time to Buy/Sell Stock</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-4"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Valid Anagram</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-5"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Contains Duplicate</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-6"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Reverse String</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-7"></div>
-                        <div class="task-content">
-                            <div class="task-name">Goal Check: solved 14 problems total this week?</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+                <!-- MONTH 3 -->
+                <div class="card month-green" id="month-3">
+                    <div class="month-header">
+                        <span class="month-title"><span class="tag green">Month 3</span> April: Advanced DSA</span>
+                        <span class="progress-indicator">0/10 Tasks</span>
+                    </div>
+                    <div class="topic-group">
+                        <div class="topic-title">Apr 1-10: Graphs</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w1-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Study: BFS, DFS</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w1-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Number of Islands</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w1-3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Clone Graph</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w1-4"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Goal Check: 15 problems total</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="topic-group">
+                        <div class="topic-title">Apr 11-20: Dynamic Programming (Easy Start)</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Climbing Stairs</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: House Robber</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Coin Change</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-4"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Goal Check: 12 problems total</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="topic-group">
+                        <div class="topic-title">Apr 21-30: Backtracking & Greedy</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Subsets</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Permutations</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">LC: Jump Game</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-4"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Goal Check: 12 problems total</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-            <div class="topic-group">
-                <div class="topic-title">Week 2 (Feb 8-14): Hashing & Two Pointers</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">Study: unordered_map, map, Sliding Window intro</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Longest Substring Without Repeating Characters</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-3"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Group Anagrams</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-4"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Valid Palindrome</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-5"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Two Sum II</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-6"></div>
-                        <div class="task-content">
-                            <div class="task-name">Goal Check: solved 15 problems total this week?</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+                <!-- MONTH 4 -->
+                <div class="card month-purple" id="month-4">
+                    <div class="month-header">
+                        <span class="month-title"><span class="tag purple">Month 4</span> May: Design + Code
+                            Quality</span>
+                        <span class="progress-indicator">0/5 Tasks</span>
+                    </div>
+                    <div class="topic-group">
+                        <div class="topic-title">May 1-15: Low-Level Design (C++)</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m4-w1-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Problem: Design LRU Cache</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m4-w1-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Problem: Design Parking Lot</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m4-w1-3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Routine: Alternate days with 1-2 LC problems</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="topic-group">
+                        <div class="topic-title">May 16-31: System Design Basics</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m4-w2-1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Study: Load Balancer, Caching, DB basics, CAP Theorem</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m4-w2-2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Routine: 1 Design/Day (30-45min)</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-            <div class="topic-group">
-                <div class="topic-title">Week 3 (Feb 15-21): Sliding Window & Recursion</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w3-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">Study: Time Complexity Deep Dive</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w3-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">Goal Check: solved 15 problems total this week?</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+                <!-- MONTH 5 -->
+                <div class="card month-blue" id="month-5">
+                    <div class="month-header">
+                        <span class="month-title"><span class="tag blue">Month 5</span> June: Mocks + Google
+                            Patterns</span>
+                        <span class="progress-indicator">0/3 Tasks</span>
+                    </div>
+                    <div class="topic-group">
+                        <div class="topic-title">Entire Month Routine</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m5-t1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Daily: Timed Leetcode (45 min)</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m5-t2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Practice: Mock Interview (4-5/week)</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m5-t3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Challenge: 1 Hard Problem every 3 days</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-            <div class="topic-group">
-                <div class="topic-title">Week 4 (Feb 22-28): Revision</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w4-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">Action: Re-solve old problems without looking</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w4-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">Action: Fix weak areas identified</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m1-w4-3"></div>
-                        <div class="task-content">
-                            <div class="task-name">Goal Check: 10 re-solves completed?</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
+                <!-- MONTH 6 -->
+                <div class="card month-red" id="month-6">
+                    <div class="month-header">
+                        <span class="month-title"><span class="tag red">Month 6</span> July: Final Polish 🔥</span>
+                        <span class="progress-indicator">0/4 Tasks</span>
+                    </div>
+                    <div class="topic-group">
+                        <div class="topic-title">Final Stretch Routine</div>
+                        <ul class="task-list">
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m6-t1"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Daily: 1 Medium (timed)</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m6-t2"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Daily: Review 1 old mistake & Speak solution OUT LOUD</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m6-t3"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Weekly: Resume Review</div>
+                                </div>
+                            </li>
+                            <li class="task-item">
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m6-t4"></div>
+                                <div class="task-content">
+                                    <div class="task-name">Weekly: Referral Outreach (2-3 people)</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-        <!-- MONTH 2 -->
-        <div class="card month-green" id="month-2">
-            <div class="month-header">
-                <span class="month-title"><span class="tag green">Month 2</span> March: Intermediate DSA</span>
-                <span class="progress-indicator">0/15 Tasks</span>
-            </div>
-            <div class="topic-group">
-                <div class="topic-title">Week 1 (Mar 1-7): Linked List</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Reverse Linked List</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Detect Cycle</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-3"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Merge Two Sorted Lists</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-4"></div>
-                        <div class="task-content">
-                            <div class="task-name">Goal Check: 12 problems total</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="topic-group">
-                <div class="topic-title">Week 2 (Mar 8-14): Stack & Queue</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Valid Parentheses</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Min Stack</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-3"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Daily Temperatures</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-4"></div>
-                        <div class="task-content">
-                            <div class="task-name">Goal Check: 12 problems total</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="topic-group">
-                <div class="topic-title">Week 3 (Mar 15-21): Binary Search (⚠️ Important)</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Binary Search</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Search in Rotated Array</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-3"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Koko Eating Bananas</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-4"></div>
-                        <div class="task-content">
-                            <div class="task-name">Goal Check: 15 problems total</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="topic-group">
-                <div class="topic-title">Week 4 (Mar 22-31): Trees (BFS/DFS)</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w4-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">Study: Inorder/Preorder/Postorder, Level Order</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w4-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Max Depth of Binary Tree</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m2-w4-3"></div>
-                        <div class="task-content">
-                            <div class="task-name">Goal Check: 15 problems total</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
+            </main>
 
-        <!-- MONTH 3 -->
-        <div class="card month-green" id="month-3">
-            <div class="month-header">
-                <span class="month-title"><span class="tag green">Month 3</span> April: Advanced DSA</span>
-                <span class="progress-indicator">0/10 Tasks</span>
-            </div>
-            <div class="topic-group">
-                <div class="topic-title">Apr 1-10: Graphs</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w1-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">Study: BFS, DFS</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w1-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Number of Islands</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w1-3"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Clone Graph</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w1-4"></div>
-                        <div class="task-content">
-                            <div class="task-name">Goal Check: 15 problems total</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="topic-group">
-                <div class="topic-title">Apr 11-20: Dynamic Programming (Easy Start)</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Climbing Stairs</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: House Robber</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-3"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Coin Change</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-4"></div>
-                        <div class="task-content">
-                            <div class="task-name">Goal Check: 12 problems total</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="topic-group">
-                <div class="topic-title">Apr 21-30: Backtracking & Greedy</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Subsets</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Permutations</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-3"></div>
-                        <div class="task-content">
-                            <div class="task-name">LC: Jump Game</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-4"></div>
-                        <div class="task-content">
-                            <div class="task-name">Goal Check: 12 problems total</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
+            <!-- SIDEBAR (Right) -->
+            <aside class="sidebar">
 
-        <!-- MONTH 4 -->
-        <div class="card month-purple" id="month-4">
-            <div class="month-header">
-                <span class="month-title"><span class="tag purple">Month 4</span> May: Design + Code Quality</span>
-                <span class="progress-indicator">0/5 Tasks</span>
-            </div>
-            <div class="topic-group">
-                <div class="topic-title">May 1-15: Low-Level Design (C++)</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m4-w1-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">Problem: Design LRU Cache</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m4-w1-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">Problem: Design Parking Lot</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m4-w1-3"></div>
-                        <div class="task-content">
-                            <div class="task-name">Routine: Alternate days with 1-2 LC problems</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="topic-group">
-                <div class="topic-title">May 16-31: System Design Basics</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m4-w2-1"></div>
-                        <div class="task-content">
-                            <div class="task-name">Study: Load Balancer, Caching, DB basics, CAP Theorem</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m4-w2-2"></div>
-                        <div class="task-content">
-                            <div class="task-name">Routine: 1 Design/Day (30-45min)</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
+                <!-- Calendar -->
+                <div class="widget-card">
+                    <div class="widget-title">Calendar</div>
+                    <div class="date-display" id="date-today">Jan 23, 2026</div>
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- JS generated -->
+                    </div>
+                </div>
 
-        <!-- MONTH 5 -->
-        <div class="card month-blue" id="month-5">
-            <div class="month-header">
-                <span class="month-title"><span class="tag blue">Month 5</span> June: Mocks + Google Patterns</span>
-                <span class="progress-indicator">0/3 Tasks</span>
-            </div>
-            <div class="topic-group">
-                <div class="topic-title">Entire Month Routine</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m5-t1"></div>
-                        <div class="task-content">
-                            <div class="task-name">Daily: Timed Leetcode (45 min)</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m5-t2"></div>
-                        <div class="task-content">
-                            <div class="task-name">Practice: Mock Interview (4-5/week)</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m5-t3"></div>
-                        <div class="task-content">
-                            <div class="task-name">Challenge: 1 Hard Problem every 3 days</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
+                <!-- Digital Clock -->
+                <div class="widget-card">
+                    <div class="widget-title">Time</div>
+                    <div class="digital-clock" id="digital-clock">00:00:00</div>
+                </div>
 
-        <!-- MONTH 6 -->
-        <div class="card month-red" id="month-6">
-            <div class="month-header">
-                <span class="month-title"><span class="tag red">Month 6</span> July: Final Polish 🔥</span>
-                <span class="progress-indicator">0/4 Tasks</span>
-            </div>
-            <div class="topic-group">
-                <div class="topic-title">Final Stretch Routine</div>
-                <ul class="task-list">
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m6-t1"></div>
-                        <div class="task-content">
-                            <div class="task-name">Daily: 1 Medium (timed)</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m6-t2"></div>
-                        <div class="task-content">
-                            <div class="task-name">Daily: Review 1 old mistake & Speak solution OUT LOUD</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m6-t3"></div>
-                        <div class="task-content">
-                            <div class="task-name">Weekly: Resume Review</div>
-                        </div>
-                    </li>
-                    <li class="task-item">
-                        <div class="checkbox-wrapper"><input type="checkbox" id="m6-t4"></div>
-                        <div class="task-content">
-                            <div class="task-name">Weekly: Referral Outreach (2-3 people)</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+                <!-- Stopwatch -->
+                <div class="widget-card">
+                    <div class="widget-title">Stopwatch</div>
+                    <div class="stopwatch-display" id="stopwatch">00:00:00</div>
+                    <div>
+                        <button class="btn btn-primary" id="sw-start">Start</button>
+                        <button class="btn" id="sw-stop">Stop</button>
+                        <button class="btn btn-danger" id="sw-reset">Reset</button>
+                    </div>
+                </div>
+
+            </aside>
+
         </div>
 
         <footer>
@@ -823,9 +989,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- CHECKBOX LOGIC ---
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 
-            // Load state
             checkboxes.forEach(box => {
                 const savedState = localStorage.getItem(box.id);
                 if (savedState === 'true') {
@@ -840,7 +1006,6 @@
                 });
             });
 
-            // Initial Progress Calculation
             updateProgress();
 
             function toggleStrikethrough(checkbox) {
@@ -853,13 +1018,11 @@
             }
 
             function updateProgress() {
-                // Overall Progress
                 const totalBoxes = checkboxes.length;
                 const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked').length;
                 const percent = Math.round((checkedBoxes / totalBoxes) * 100);
                 document.getElementById('total-progress').innerText = `${percent}%`;
 
-                // Month-wise Progress
                 const months = document.querySelectorAll('.card[id^="month-"]');
                 months.forEach(month => {
                     const monthBoxes = month.querySelectorAll('input[type="checkbox"]');
@@ -867,8 +1030,6 @@
                     const indicator = month.querySelector('.progress-indicator');
                     if (indicator && monthBoxes.length > 0) {
                         indicator.innerText = `${monthChecked.length}/${monthBoxes.length} Done`;
-
-                        // Add visual cue for completed month
                         if (monthChecked.length === monthBoxes.length) {
                             indicator.style.color = 'var(--google-green)';
                             indicator.innerHTML += ' ✅';
@@ -878,6 +1039,85 @@
                     }
                 });
             }
+
+            // --- WIDGETS LOGIC ---
+
+            // 1. Digital Clock
+            function updateTime() {
+                const now = new Date();
+                document.getElementById('digital-clock').innerText = now.toLocaleTimeString('en-US', { hour12: false });
+                document.getElementById('date-today').innerText = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            }
+            setInterval(updateTime, 1000);
+            updateTime();
+
+            // 2. Stopwatch
+            let swInterval;
+            let swSeconds = 0;
+            const swDisplay = document.getElementById('stopwatch');
+
+            function formatTime(totalSeconds) {
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                return [hours, minutes, seconds]
+                    .map(v => v.toString().padStart(2, '0'))
+                    .join(':');
+            }
+
+            document.getElementById('sw-start').addEventListener('click', () => {
+                if (swInterval) return;
+                swInterval = setInterval(() => {
+                    swSeconds++;
+                    swDisplay.innerText = formatTime(swSeconds);
+                }, 1000);
+            });
+
+            document.getElementById('sw-stop').addEventListener('click', () => {
+                clearInterval(swInterval);
+                swInterval = null;
+            });
+
+            document.getElementById('sw-reset').addEventListener('click', () => {
+                clearInterval(swInterval);
+                swInterval = null;
+                swSeconds = 0;
+                swDisplay.innerText = "00:00:00";
+            });
+
+            // 3. Simple Monthly Calendar
+            function renderCalendar() {
+                const grid = document.getElementById('calendar-grid');
+                const now = new Date();
+                const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                const today = now.getDate();
+
+                // Headers
+                const daysShort = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                daysShort.forEach(d => {
+                    const el = document.createElement('div');
+                    el.className = 'cal-day-name';
+                    el.innerText = d;
+                    grid.appendChild(el);
+                });
+
+                // Empty slots for start of month
+                const firstDayIndex = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+                for (let i = 0; i < firstDayIndex; i++) {
+                    grid.appendChild(document.createElement('div'));
+                }
+
+                // Days
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'cal-day';
+                    el.innerText = i;
+                    if (i === today) el.classList.add('cal-today');
+                    grid.appendChild(el);
+                }
+            }
+            renderCalendar();
+
         });
     </script>
 
