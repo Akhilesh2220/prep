@@ -55,7 +55,6 @@
 
             .sidebar {
                 order: -1;
-                /* Show sidebar on top on mobile? Or bottom? Let's keep existing flow or put sidebar on top for util access */
             }
         }
 
@@ -951,6 +950,15 @@
             <!-- SIDEBAR (Right) -->
             <aside class="sidebar">
 
+                <!-- Sync Settings -->
+                <div class="widget-card">
+                    <div class="widget-title">Cloud Sync <span id="sync-status" style="font-size:0.8em">⚪</span></div>
+                    <div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:10px;">
+                        Sync progress across devices.
+                    </div>
+                    <button class="btn" id="btn-settings" style="width:100%">⚙️ Setup Sync</button>
+                </div>
+
                 <!-- Calendar -->
                 <div class="widget-card">
                     <div class="widget-title">Calendar</div>
@@ -980,15 +988,179 @@
             </aside>
 
         </div>
-
-        <footer>
-            <p>Keep going. Google is waiting! 🚀</p>
-        </footer>
-
     </div>
+
+    <!-- Sync Settings Modal -->
+    <div id="sync-modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div
+            style="background:white; padding:24px; border-radius:12px; max-width:400px; width:90%; box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+            <h3 style="margin-bottom:12px;">GitHub Sync Setup</h3>
+            <p style="font-size:0.9rem; color:#5f6368; margin-bottom:16px;">
+                Enter a <strong>GitHub Personal Access Token</strong> (Classic) with <code>repo</code> scope to sync
+                your progress to <code>progress.json</code> in this repository.
+            </p>
+            <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx"
+                style="width:100%; padding:10px; border:1px solid #dadce0; border-radius:4px; margin-bottom:10px;">
+            <input type="text" id="gh-repo" placeholder="username/repo-name" value="Akhilesh2220/prep"
+                style="width:100%; padding:10px; border:1px solid #dadce0; border-radius:4px; margin-bottom:20px;">
+            <div style="text-align:right;">
+                <button class="btn" id="btn-cancel">Cancel</button>
+                <button class="btn btn-primary" id="btn-save-token">Save & Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Keep going. Google is waiting! 🚀</p>
+    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- SYNC CONFIG ---
+            const REPO_FILE_PATH = 'progress.json';
+            let GITHUB_TOKEN = localStorage.getItem('gh_token');
+            let GITHUB_REPO = localStorage.getItem('gh_repo') || 'Akhilesh2220/prep';
+            let fileSha = null; // Needed for update API
+            let syncDebounceTimer = null;
+
+            // UI Refs
+            const btnSettings = document.getElementById('btn-settings');
+            const modal = document.getElementById('sync-modal');
+            const btnCancel = document.getElementById('btn-cancel');
+            const btnSaveToken = document.getElementById('btn-save-token');
+            const inputToken = document.getElementById('gh-token');
+            const inputRepo = document.getElementById('gh-repo');
+            const statusIndicator = document.getElementById('sync-status');
+
+            if (GITHUB_TOKEN) {
+                statusIndicator.innerText = "🟡"; // Connecting...
+                fetchFromGitHub();
+            }
+
+            // Modal Logic
+            btnSettings.addEventListener('click', () => {
+                modal.style.display = 'flex';
+                inputToken.value = GITHUB_TOKEN || '';
+                inputRepo.value = GITHUB_REPO || 'Akhilesh2220/prep';
+            });
+            btnCancel.addEventListener('click', () => modal.style.display = 'none');
+            btnSaveToken.addEventListener('click', () => {
+                const token = inputToken.value.trim();
+                const repo = inputRepo.value.trim();
+                if (token && repo) {
+                    localStorage.setItem('gh_token', token);
+                    localStorage.setItem('gh_repo', repo);
+                    GITHUB_TOKEN = token;
+                    GITHUB_REPO = repo;
+                    modal.style.display = 'none';
+                    statusIndicator.innerText = "🟡";
+                    fetchFromGitHub();
+                } else {
+                    alert("Please enter both Token and Repo name.");
+                }
+            });
+
+            // --- GITHUB API ---
+
+            async function fetchFromGitHub() {
+                if (!GITHUB_TOKEN) return;
+                try {
+                    const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${REPO_FILE_PATH}`, {
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+
+                    if (response.status === 404) {
+                        // File doesn't exist yet, create it with local data
+                        console.log("File not found, creating initial cloud file...");
+                        saveToGitHub(true);
+                        statusIndicator.innerText = "🟢";
+                        return;
+                    }
+
+                    if (!response.ok) throw new Error('Fetch failed');
+
+                    const data = await response.json();
+                    fileSha = data.sha;
+                    const content = atob(data.content); // Decode Base64
+                    const cloudProgress = JSON.parse(content);
+
+                    applyCloudProgress(cloudProgress);
+                    statusIndicator.innerText = "🟢";
+
+                } catch (e) {
+                    console.error("Sync Error:", e);
+                    statusIndicator.innerText = "🔴";
+                }
+            }
+
+            async function saveToGitHub(forceImmediate = false) {
+                if (!GITHUB_TOKEN) return;
+
+                // Gather all checked IDs
+                const checkedIds = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.id);
+                const contentJson = JSON.stringify(checkedIds);
+                const contentBase64 = btoa(contentJson);
+
+                const body = {
+                    message: "Update progress",
+                    content: contentBase64,
+                    ...(fileSha ? { sha: fileSha } : {}) // SHA needed if updating
+                };
+
+                const doCall = async () => {
+                    statusIndicator.innerText = "Cp..."; // Cloud pushing...
+                    try {
+                        const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${REPO_FILE_PATH}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `token ${GITHUB_TOKEN}`,
+                                'Accept': 'application/vnd.github.v3+json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(body)
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            fileSha = data.content.sha; // Update SHA for next write
+                            statusIndicator.innerText = "🟢";
+                        } else {
+                            throw new Error('Save failed');
+                        }
+                    } catch (e) {
+                        console.error("Save Error:", e);
+                        statusIndicator.innerText = "🔴";
+                        // If SHA mismatch (409 conflict), simpler to just let next fetch sync it, or user refresh
+                        // For a personal tool, this "Last Write Wins" is usually okayish
+                    }
+                };
+
+                if (forceImmediate) {
+                    doCall();
+                } else {
+                    clearTimeout(syncDebounceTimer);
+                    syncDebounceTimer = setTimeout(doCall, 2000); // 2s debounce
+                }
+            }
+
+            function applyCloudProgress(cloudIds) {
+                if (!Array.isArray(cloudIds)) return;
+
+                document.querySelectorAll('input[type="checkbox"]').forEach(box => {
+                    const shouldCheck = cloudIds.includes(box.id);
+                    if (box.checked !== shouldCheck) {
+                        box.checked = shouldCheck;
+                        toggleStrikethrough(box);
+                        localStorage.setItem(box.id, shouldCheck); // Sync to local storage too
+                    }
+                });
+                updateProgress();
+            }
+
+
             // --- CHECKBOX LOGIC ---
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 
@@ -1003,6 +1175,7 @@
                     localStorage.setItem(box.id, box.checked);
                     toggleStrikethrough(box);
                     updateProgress();
+                    saveToGitHub(); // Trigger cloud sync
                 });
             });
 
