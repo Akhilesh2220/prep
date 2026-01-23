@@ -35,6 +35,12 @@
             padding-bottom: 60px;
         }
 
+        /* Hide native date picker icon */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0;
+            cursor: pointer;
+        }
+
         /* --- Components --- */
         .container {
             max-width: 1200px;
@@ -48,6 +54,12 @@
             gap: 24px;
         }
 
+        .sidebar {
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+
         @media (max-width: 900px) {
             .layout-grid {
                 grid-template-columns: 1fr;
@@ -55,14 +67,73 @@
 
             .sidebar {
                 order: -1;
+                /* Disable sticky on mobile to prevent overlapping main content */
+                position: static;
+                margin-bottom: 24px;
+            }
+
+            .progress-rail {
+                display: none;
+                /* Hide rail on small screens */
+            }
+
+            body {
+                padding-left: 0;
+            }
+
+            /* Mobile header alignment fix */
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            .tracker-summary {
+                font-size: 0.85rem;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 4px;
+            }
+
+            /* Mobile month card header - stack vertically */
+            .month-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .month-title {
+                flex-wrap: wrap;
+                font-size: 1.2rem;
+            }
+
+            .progress-indicator {
+                align-self: flex-start;
+            }
+
+            /* Hide colons on mobile */
+            .topic-colon {
+                display: none;
+            }
+
+            /* Stack month topic on new line */
+            .month-topic-text {
+                display: block;
+                margin-top: 4px;
+            }
+
+            /* Stack week title and topic vertically */
+            .topic-title {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .week-topic-text {
+                display: block;
             }
         }
 
-        .sidebar {
-            position: sticky;
-            top: 20px;
-            height: fit-content;
-        }
+        /* No extra padding needed on desktop */
 
         h1,
         h2,
@@ -341,13 +412,7 @@
             margin-bottom: 10px;
         }
 
-        /* Stopwatch */
-        .stopwatch-display {
-            font-size: 2rem;
-            font-weight: 500;
-            margin-bottom: 15px;
-            font-variant-numeric: tabular-nums;
-        }
+
 
         .btn {
             background: var(--bg-color);
@@ -391,6 +456,7 @@
             font-weight: bold;
             font-size: 0.8rem;
             color: var(--text-secondary);
+            text-align: center;
         }
 
         .cal-day {
@@ -416,40 +482,63 @@
             margin-top: 40px;
             font-size: 0.9rem;
         }
+
+        /* --- Global Left Progress Bar --- */
+        .progress-bar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100vh;
+            background: #e8eaed;
+            z-index: 100;
+        }
+
+        .progress-bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to bottom, var(--google-green), #34d399);
+            transition: height 0.4s ease;
+            border-radius: 0 0 3px 3px;
+        }
     </style>
 </head>
 
 <body>
-
+    <!-- Global Progress Bar (Left Edge) -->
+    <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="global-progress-bar"></div>
+    </div>
     <div class="container">
-
         <header>
             <h1><span style="color:var(--google-blue)">G</span><span style="color:var(--google-red)">o</span><span
                     style="color:var(--google-yellow)">o</span><span style="color:var(--google-blue)">g</span><span
-                    style="color:var(--google-green)">l</span><span style="color:var(--google-red)">e</span> Prep
+                    style="color:var(--google-green)">l</span><span style="color:var(--google-red)">e</span>Prep
                 Roadmap</h1>
-            <p class="tracker-summary">Feb 1 — July 31 • <span id="total-progress">0%</span> Complete</p>
+            <p class="tracker-summary">
+                <span id="date-trigger" style="cursor:pointer;" title="Click to change start date">📅</span>
+                <input type="date" id="start-date-picker" style="position:absolute; opacity:0; pointer-events:none;">
+                Start - <span id="start-date-display" style="font-weight:500;">01 Feb</span>
+                · End - <span id="end-date-display" style="font-weight:500;">31 Jul</span> • <span
+                    id="total-progress">0%</span> Complete
+            </p>
         </header>
-
         <div class="layout-grid">
-
             <!-- MAIN CONTENT (Left) -->
             <main class="main-content">
-
                 <!-- recurring tasks -->
                 <div class="card">
-                    <h2 class="month-header" style="border:none; margin-bottom: 20px;">
-                        <span class="month-title">📅 Recurring Daily Schedule</span>
-                    </h2>
+                    <h2 class="month-header" style="border:none; margin-bottom: 20px;"><span class="month-title">📅
+                            Recurring Daily Schedule</span></h2>
                     <div class="daily-routine">
                         <div style="background: #e8f0fe; padding: 16px; border-radius: 8px;">
                             <h3 style="color: #1967d2; margin-bottom: 12px;">Weekdays</h3>
-                            <div class="time-block">
-                                <span class="time-icon">🕕</span>
-                                <div class="time-text">
-                                    <strong>7:00 PM – 9:30 PM</strong>
-                                    <span>Focused Deep Work Block</span>
-                                </div>
+                            <div class="time-block"><span class="time-icon">🕕</span>
+                                <div class="time-text"><strong>7:00 PM – 9:30 PM</strong><span>Focused Deep
+                                        Work Block</span></div>
                             </div>
                             <div class="task-list">
                                 <div class="task-item">🔹 30 min: Concept/Theory</div>
@@ -458,12 +547,9 @@
                         </div>
                         <div style="background: #fce8e6; padding: 16px; border-radius: 8px;">
                             <h3 style="color: #c5221f; margin-bottom: 12px;">Weekends</h3>
-                            <div class="time-block">
-                                <span class="time-icon">🕘</span>
-                                <div class="time-text">
-                                    <strong>10:00 AM – 2:00 PM</strong>
-                                    <span>Marathon Session</span>
-                                </div>
+                            <div class="time-block"><span class="time-icon">🕘</span>
+                                <div class="time-text"><strong>10:00 AM – 2:00 PM</strong><span>Marathon
+                                        Session</span></div>
                             </div>
                             <div class="task-list">
                                 <div class="task-item">🔹 Deep Dive / Contest Prep</div>
@@ -472,22 +558,26 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- MONTH 1 -->
                 <div class="card month-green" id="month-1">
-                    <div class="month-header">
-                        <span class="month-title"><span class="tag green">Month 1</span> Feb: Foundations C++ & Basic
-                            DSA</span>
-                        <span class="progress-indicator">0/34 Tasks</span>
+                    <div class="month-header"><span class="month-title"><span class="tag green">Month
+                                1</span><span class="dynamic-month" data-offset="0">Feb</span><span
+                                class="topic-colon">:</span>
+                            <span class="month-topic-text">Foundations C++&amp; Basic DSA</span></span><span
+                            class="progress-indicator">0/34
+                            Tasks</span>
                     </div>
-
                     <div class="topic-group">
-                        <div class="topic-title">Week 1 (Feb 1-7): Arrays & Strings</div>
+                        <div class="topic-title"><span class="week-title" data-month-offset="0" data-week-index="1"
+                                data-start-day="1" data-end-day="7">Week
+                                1 (Feb 1-7)</span><span class="topic-colon">:</span> <span
+                                class="week-topic-text">Arrays & Strings</span></div>
                         <ul class="task-list">
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-1"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Study: C++ STL (vector, string, references)</div>
+                                    <div class="task-name">Study: C++STL (vector, string, references)
+                                    </div>
                                 </div>
                             </li>
                             <li class="task-item">
@@ -523,126 +613,160 @@
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m1-w1-7"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Goal Check: solved 14 problems total this week?</div>
+                                    <div class="task-name">Goal Check: solved 14 problems total this
+                                        week?</div>
                                 </div>
                             </li>
                         </ul>
                     </div>
                     <!-- Week 2 -->
                     <div class="topic-group">
-                        <div class="topic-title">Week 2 (Feb 8-14): Hashing & Two Pointers</div>
+                        <div class="topic-title"><span class="week-title" data-month-offset="0" data-week-index="2"
+                                data-start-day="8" data-end-day="14">Week
+                                2 (Feb 8-14)</span><span class="topic-colon">:</span> <span
+                                class="week-topic-text">Hashing & Two Pointers</span>
+                        </div>
                         <ul class="task-list">
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-1"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-1">
+                                </div>
                                 <div class="task-content">
-                                    <div class="task-name">Study: unordered_map, map, Sliding Window intro</div>
+                                    <div class="task-name">Study: unordered_map,
+                                        map,
+                                        Sliding Window intro</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-2"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-2">
+                                </div>
                                 <div class="task-content">
-                                    <div class="task-name">LC: Longest Substring Without Repeating Characters</div>
+                                    <div class="task-name">LC: Longest Substring Without Repeating
+                                        Characters</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-3"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-3">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Group Anagrams</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-4"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-4">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Valid Palindrome</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-5"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-5">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Two Sum II</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-6"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m1-w2-6">
+                                </div>
                                 <div class="task-content">
-                                    <div class="task-name">Goal Check: solved 15 problems total this week?</div>
+                                    <div class="task-name">Goal Check: solved 15 problems total this
+                                        week?</div>
                                 </div>
                             </li>
                         </ul>
                     </div>
                     <!-- Week 3 -->
                     <div class="topic-group">
-                        <div class="topic-title">Week 3 (Feb 15-21): Sliding Window & Recursion</div>
+                        <div class="topic-title"><span class="week-title" data-month-offset="0" data-week-index="3"
+                                data-start-day="15" data-end-day="21">Week
+                                3 (Feb 15-21)</span><span class="topic-colon">:</span> <span
+                                class="week-topic-text">Sliding Window &
+                                Recursion</span></div>
                         <ul class="task-list">
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m1-w3-1"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Study: Time Complexity Deep Dive</div>
+                                    <div class="task-name">Study: Time Complexity Deep Dive
+                                    </div>
                                 </div>
                             </li>
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m1-w3-2"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Goal Check: solved 15 problems total this week?</div>
+                                    <div class="task-name">Goal Check: solved 15 problems total
+                                        this week?</div>
                                 </div>
                             </li>
                         </ul>
                     </div>
                     <!-- Week 4 -->
                     <div class="topic-group">
-                        <div class="topic-title">Week 4 (Feb 22-28): Revision</div>
+                        <div class="topic-title"><span class="week-title" data-month-offset="0" data-week-index="4"
+                                data-start-day="22" data-end-day="28">Week
+                                4 (Feb
+                                22-28)</span><span class="topic-colon">:</span> <span
+                                class="week-topic-text">Revision</span></div>
                         <ul class="task-list">
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m1-w4-1"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Action: Re-solve old problems without looking</div>
+                                    <div class="task-name">Action: Re-solve old problems
+                                        without looking</div>
                                 </div>
                             </li>
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m1-w4-2"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Action: Fix weak areas identified</div>
+                                    <div class="task-name">Action: Fix weak areas identified
+                                    </div>
                                 </div>
                             </li>
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m1-w4-3"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Goal Check: 10 re-solves completed?</div>
+                                    <div class="task-name">Goal Check: 10 re-solves
+                                        completed?</div>
                                 </div>
                             </li>
                         </ul>
                     </div>
                 </div>
-
                 <!-- MONTH 2 -->
                 <div class="card month-green" id="month-2">
-                    <div class="month-header">
-                        <span class="month-title"><span class="tag green">Month 2</span> March: Intermediate DSA</span>
-                        <span class="progress-indicator">0/15 Tasks</span>
-                    </div>
+                    <div class="month-header"><span class="month-title"><span class="tag green">Month 2</span><span
+                                class="dynamic-month" data-offset="1">March</span><span class="topic-colon">:</span>
+                            <span class="month-topic-text">Intermediate DSA</span></span><span
+                            class="progress-indicator">0/15 Tasks</span></div>
                     <div class="topic-group">
-                        <div class="topic-title">Week 1 (Mar 1-7): Linked List</div>
+                        <div class="topic-title"><span class="week-title" data-month-offset="1" data-week-index="1"
+                                data-start-day="1" data-end-day="7">Week
+                                1 (Mar 1-7)</span><span class="topic-colon">:</span> <span
+                                class="week-topic-text">Linked List</span></div>
                         <ul class="task-list">
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-1"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-1">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Reverse Linked List</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-2"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-2">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Detect Cycle</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-3"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-3">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Merge Two Sorted Lists</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-4"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w1-4">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">Goal Check: 12 problems total</div>
                                 </div>
@@ -650,28 +774,35 @@
                         </ul>
                     </div>
                     <div class="topic-group">
-                        <div class="topic-title">Week 2 (Mar 8-14): Stack & Queue</div>
+                        <div class="topic-title"><span class="week-title" data-month-offset="1" data-week-index="2"
+                                data-start-day="8" data-end-day="14">Week
+                                2 (Mar 8-14)</span><span class="topic-colon">:</span> <span
+                                class="week-topic-text">Stack & Queue</span></div>
                         <ul class="task-list">
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-1"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-1">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Valid Parentheses</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-2"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-2">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Min Stack</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-3"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-3">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Daily Temperatures</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-4"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w2-4">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">Goal Check: 12 problems total</div>
                                 </div>
@@ -679,28 +810,36 @@
                         </ul>
                     </div>
                     <div class="topic-group">
-                        <div class="topic-title">Week 3 (Mar 15-21): Binary Search (⚠️ Important)</div>
+                        <div class="topic-title"><span class="week-title" data-month-offset="1" data-week-index="3"
+                                data-start-day="15" data-end-day="21">Week
+                                3 (Mar 15-21)</span><span class="topic-colon">:</span> <span
+                                class="week-topic-text">Binary Search (⚠️
+                                Important)</span></div>
                         <ul class="task-list">
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-1"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-1">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Binary Search</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-2"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-2">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Search in Rotated Array</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-3"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-3">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Koko Eating Bananas</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-4"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w3-4">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">Goal Check: 15 problems total</div>
                                 </div>
@@ -708,22 +847,29 @@
                         </ul>
                     </div>
                     <div class="topic-group">
-                        <div class="topic-title">Week 4 (Mar 22-31): Trees (BFS/DFS)</div>
+                        <div class="topic-title"><span class="week-title" data-month-offset="1" data-week-index="4"
+                                data-start-day="22" data-end-day="31">Week
+                                4 (Mar 22-31)</span><span class="topic-colon">:</span> <span
+                                class="week-topic-text">Trees (BFS/DFS)</span></div>
                         <ul class="task-list">
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w4-1"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w4-1">
+                                </div>
                                 <div class="task-content">
-                                    <div class="task-name">Study: Inorder/Preorder/Postorder, Level Order</div>
+                                    <div class="task-name">Study: Inorder/Preorder/Postorder,
+                                        Level Order</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w4-2"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w4-2">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">LC: Max Depth of Binary Tree</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w4-3"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m2-w4-3">
+                                </div>
                                 <div class="task-content">
                                     <div class="task-name">Goal Check: 15 problems total</div>
                                 </div>
@@ -731,20 +877,26 @@
                         </ul>
                     </div>
                 </div>
-
                 <!-- MONTH 3 -->
                 <div class="card month-green" id="month-3">
-                    <div class="month-header">
-                        <span class="month-title"><span class="tag green">Month 3</span> April: Advanced DSA</span>
-                        <span class="progress-indicator">0/10 Tasks</span>
+                    <div class="month-header"><span class="month-title"><span class="tag green">Month 3</span><span
+                                class="dynamic-month" data-offset="2">April</span><span class="topic-colon">:</span>
+                            <span class="month-topic-text">Advanced DSA</span></span><span
+                            class="progress-indicator">0/10
+                            Tasks</span>
                     </div>
                     <div class="topic-group">
-                        <div class="topic-title">Apr 1-10: Graphs</div>
+                        <div class="topic-title"><span class="week-title" data-month-offset="2" data-week-index="1"
+                                data-start-day="1" data-end-day="10">Apr
+                                1-10</span><span class="topic-colon">:</span>
+                            <span class="week-topic-text">Graphs</span>
+                        </div>
                         <ul class="task-list">
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m3-w1-1"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Study: BFS, DFS</div>
+                                    <div class="task-name">Study: BFS,
+                                        DFS</div>
                                 </div>
                             </li>
                             <li class="task-item">
@@ -762,126 +914,154 @@
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m3-w1-4"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Goal Check: 15 problems total</div>
+                                    <div class="task-name">Goal Check: 15 problems total
+                                    </div>
                                 </div>
                             </li>
                         </ul>
                     </div>
                     <div class="topic-group">
-                        <div class="topic-title">Apr 11-20: Dynamic Programming (Easy Start)</div>
-                        <ul class="task-list">
-                            <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-1"></div>
-                                <div class="task-content">
-                                    <div class="task-name">LC: Climbing Stairs</div>
-                                </div>
-                            </li>
-                            <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-2"></div>
-                                <div class="task-content">
-                                    <div class="task-name">LC: House Robber</div>
-                                </div>
-                            </li>
-                            <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-3"></div>
-                                <div class="task-content">
-                                    <div class="task-name">LC: Coin Change</div>
-                                </div>
-                            </li>
-                            <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-4"></div>
-                                <div class="task-content">
-                                    <div class="task-name">Goal Check: 12 problems total</div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="topic-group">
-                        <div class="topic-title">Apr 21-30: Backtracking & Greedy</div>
-                        <ul class="task-list">
-                            <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-1"></div>
-                                <div class="task-content">
-                                    <div class="task-name">LC: Subsets</div>
-                                </div>
-                            </li>
-                            <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-2"></div>
-                                <div class="task-content">
-                                    <div class="task-name">LC: Permutations</div>
-                                </div>
-                            </li>
-                            <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-3"></div>
-                                <div class="task-content">
-                                    <div class="task-name">LC: Jump Game</div>
-                                </div>
-                            </li>
-                            <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-4"></div>
-                                <div class="task-content">
-                                    <div class="task-name">Goal Check: 12 problems total</div>
-                                </div>
-                            </li>
-                        </ul>
+                        <div class="topic-group">
+                            <div class="topic-title"><span class="week-title" data-month-offset="2" data-week-index="2"
+                                    data-start-day="11" data-end-day="20">Apr
+                                    11-20</span><span class="topic-colon">:</span> <span class="week-topic-text">Dynamic
+                                    Programming (Easy Start)</span></div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-1"></div>
+                                    <div class="task-content">
+                                        <div class="task-name">LC: Climbing Stairs</div>
+                                    </div>
+                                </li>
+                                <li class="task-item">
+                                    <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-2"></div>
+                                    <div class="task-content">
+                                        <div class="task-name">LC: House Robber</div>
+                                    </div>
+                                </li>
+                                <li class="task-item">
+                                    <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-3"></div>
+                                    <div class="task-content">
+                                        <div class="task-name">LC: Coin Change</div>
+                                    </div>
+                                </li>
+                                <li class="task-item">
+                                    <div class="checkbox-wrapper"><input type="checkbox" id="m3-w2-4"></div>
+                                    <div class="task-content">
+                                        <div class="task-name">Goal Check: 12 problems total
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="topic-group">
+                            <div class="topic-group">
+                                <div class="topic-title"><span class="week-title" data-month-offset="2"
+                                        data-week-index="3" data-start-day="21" data-end-day="30">Apr
+                                        21-30</span><span class="topic-colon">:</span> <span
+                                        class="week-topic-text">Backtracking & Greedy</span></div>
+                                <ul class="task-list">
+                                    <li class="task-item">
+                                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-1"></div>
+                                        <div class="task-content">
+                                            <div class="task-name">LC: Subsets</div>
+                                        </div>
+                                    </li>
+                                    <li class="task-item">
+                                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-2"></div>
+                                        <div class="task-content">
+                                            <div class="task-name">LC: Permutations</div>
+                                        </div>
+                                    </li>
+                                    <li class="task-item">
+                                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-3"></div>
+                                        <div class="task-content">
+                                            <div class="task-name">LC: Jump Game</div>
+                                        </div>
+                                    </li>
+                                    <li class="task-item">
+                                        <div class="checkbox-wrapper"><input type="checkbox" id="m3-w3-4"></div>
+                                        <div class="task-content">
+                                            <div class="task-name">Goal Check: 12 problems
+                                                total</div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
                 <!-- MONTH 4 -->
                 <div class="card month-purple" id="month-4">
-                    <div class="month-header">
-                        <span class="month-title"><span class="tag purple">Month 4</span> May: Design + Code
-                            Quality</span>
-                        <span class="progress-indicator">0/5 Tasks</span>
-                    </div>
+                    <div class="month-header"><span class="month-title"><span class="tag purple">Month
+                                4</span><span class="dynamic-month" data-offset="3">May</span><span
+                                class="topic-colon">:</span>
+                            <span class="month-topic-text">Design+Code Quality</span></span><span
+                            class="progress-indicator">0/5
+                            Tasks</span></div>
                     <div class="topic-group">
-                        <div class="topic-title">May 1-15: Low-Level Design (C++)</div>
+                        <div class="topic-title"><span class="week-title" data-month-offset="3" data-week-index="1"
+                                data-start-day="1" data-end-day="15">May 1-15</span><span class="topic-colon">:</span>
+                            <span class="week-topic-text">Low-Level Design
+                                (C++)</span>
+                        </div>
                         <ul class="task-list">
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m4-w1-1"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Problem: Design LRU Cache</div>
+                                    <div class="task-name">Problem: Design LRU
+                                        Cache</div>
                                 </div>
                             </li>
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m4-w1-2"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Problem: Design Parking Lot</div>
+                                    <div class="task-name">Problem: Design
+                                        Parking Lot</div>
                                 </div>
                             </li>
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m4-w1-3"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Routine: Alternate days with 1-2 LC problems</div>
+                                    <div class="task-name">Routine: Alternate
+                                        days with 1-2 LC problems </div>
                                 </div>
                             </li>
                         </ul>
                     </div>
                     <div class="topic-group">
-                        <div class="topic-title">May 16-31: System Design Basics</div>
+                        <div class="topic-title"><span class="week-title" data-month-offset="3" data-week-index="2"
+                                data-start-day="16" data-end-day="31">May
+                                16-31</span><span class="topic-colon">:</span> <span class="week-topic-text">System
+                                Design Basics</span>
+                        </div>
                         <ul class="task-list">
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m4-w2-1"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Study: Load Balancer, Caching, DB basics, CAP Theorem</div>
+                                    <div class="task-name">Study: Load Balancer,
+                                        Caching,
+                                        DB basics,
+                                        CAP Theorem</div>
                                 </div>
                             </li>
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m4-w2-2"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Routine: 1 Design/Day (30-45min)</div>
+                                    <div class="task-name">Routine: 1 Design/Day
+                                        (30-45min)</div>
                                 </div>
                             </li>
                         </ul>
                     </div>
                 </div>
-
                 <!-- MONTH 5 -->
                 <div class="card month-blue" id="month-5">
-                    <div class="month-header">
-                        <span class="month-title"><span class="tag blue">Month 5</span> June: Mocks + Google
-                            Patterns</span>
-                        <span class="progress-indicator">0/3 Tasks</span>
+                    <div class="month-header"><span class="month-title"><span class="tag blue">Month
+                                5</span><span class="dynamic-month" data-offset="4">June</span><span
+                                class="topic-colon">:</span>
+                            <span class="month-topic-text">Mocks+Google Patterns</span></span><span
+                            class="progress-indicator">0/3 Tasks</span>
                     </div>
                     <div class="topic-group">
                         <div class="topic-title">Entire Month Routine</div>
@@ -889,142 +1069,152 @@
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m5-t1"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Daily: Timed Leetcode (45 min)</div>
+                                    <div class="task-name">Daily: Timed
+                                        Leetcode (45 min)</div>
                                 </div>
                             </li>
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m5-t2"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Practice: Mock Interview (4-5/week)</div>
+                                    <div class="task-name">Practice: Mock
+                                        Interview (4-5/week)</div>
                                 </div>
                             </li>
                             <li class="task-item">
                                 <div class="checkbox-wrapper"><input type="checkbox" id="m5-t3"></div>
                                 <div class="task-content">
-                                    <div class="task-name">Challenge: 1 Hard Problem every 3 days</div>
+                                    <div class="task-name">Challenge: 1 Hard
+                                        Problem every 3 days</div>
                                 </div>
                             </li>
                         </ul>
                     </div>
                 </div>
-
                 <!-- MONTH 6 -->
                 <div class="card month-red" id="month-6">
-                    <div class="month-header">
-                        <span class="month-title"><span class="tag red">Month 6</span> July: Final Polish 🔥</span>
-                        <span class="progress-indicator">0/4 Tasks</span>
+                    <div class="month-header"><span class="month-title"><span class="tag red">Month
+                                6</span><span class="dynamic-month" data-offset="5">July</span><span
+                                class="topic-colon">:</span>
+                            <span class="month-topic-text">Final Polish 🔥</span></span><span
+                            class="progress-indicator">0/4 Tasks</span>
                     </div>
                     <div class="topic-group">
-                        <div class="topic-title">Final Stretch Routine</div>
+                        <div class="topic-title">Final Stretch Routine
+                        </div>
                         <ul class="task-list">
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m6-t1"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m6-t1">
+                                </div>
                                 <div class="task-content">
-                                    <div class="task-name">Daily: 1 Medium (timed)</div>
+                                    <div class="task-name">Daily: 1
+                                        Medium (timed)</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m6-t2"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m6-t2">
+                                </div>
                                 <div class="task-content">
-                                    <div class="task-name">Daily: Review 1 old mistake & Speak solution OUT LOUD</div>
+                                    <div class="task-name">Daily: Review
+                                        1 old mistake & Speak solution
+                                        OUT LOUD</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m6-t3"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m6-t3">
+                                </div>
                                 <div class="task-content">
-                                    <div class="task-name">Weekly: Resume Review</div>
+                                    <div class="task-name">Weekly:
+                                        Resume Review</div>
                                 </div>
                             </li>
                             <li class="task-item">
-                                <div class="checkbox-wrapper"><input type="checkbox" id="m6-t4"></div>
+                                <div class="checkbox-wrapper"><input type="checkbox" id="m6-t4">
+                                </div>
                                 <div class="task-content">
-                                    <div class="task-name">Weekly: Referral Outreach (2-3 people)</div>
+                                    <div class="task-name">Weekly:
+                                        Referral Outreach (2-3 people)
+                                    </div>
                                 </div>
                             </li>
                         </ul>
                     </div>
                 </div>
-
             </main>
-
             <!-- SIDEBAR (Right) -->
             <aside class="sidebar">
-
                 <!-- Sync Settings -->
                 <div class="widget-card">
                     <div class="widget-title">Cloud Sync <span id="sync-status" style="font-size:0.8em">⚪</span></div>
                     <div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:10px;">
-                        Sync progress across devices.
-                    </div>
-                    <button class="btn" id="btn-settings" style="width:100%">⚙️ Setup Sync</button>
+                        Sync progress across devices. </div><button class="btn" id="btn-settings" style="width:100%">⚙️
+                        Setup Sync</button>
                 </div>
-
                 <!-- Calendar -->
                 <div class="widget-card">
                     <div class="widget-title">Calendar</div>
-                    <div class="date-display" id="date-today">Jan 23, 2026</div>
+                    <div class="date-display" id="date-today">Jan 23,
+                        2026</div>
                     <div class="calendar-grid" id="calendar-grid">
                         <!-- JS generated -->
                     </div>
                 </div>
-
                 <!-- Digital Clock -->
                 <div class="widget-card">
                     <div class="widget-title">Time</div>
                     <div class="digital-clock" id="digital-clock">00:00:00</div>
                 </div>
-
-                <!-- Stopwatch -->
-                <div class="widget-card">
-                    <div class="widget-title">Stopwatch</div>
-                    <div class="stopwatch-display" id="stopwatch">00:00:00</div>
-                    <div>
-                        <button class="btn btn-primary" id="sw-start">Start</button>
-                        <button class="btn" id="sw-stop">Stop</button>
-                        <button class="btn btn-danger" id="sw-reset">Reset</button>
-                    </div>
-                </div>
-
             </aside>
-
         </div>
     </div>
-
     <!-- Sync Settings Modal -->
     <div id="sync-modal"
         style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
         <div
             style="background:white; padding:24px; border-radius:12px; max-width:400px; width:90%; box-shadow:0 4px 20px rgba(0,0,0,0.2);">
             <h3 style="margin-bottom:12px;">GitHub Sync Setup</h3>
-            <p style="font-size:0.9rem; color:#5f6368; margin-bottom:16px;">
-                Enter a <strong>GitHub Personal Access Token</strong> (Classic) with <code>repo</code> scope to sync
-                your progress to <code>progress.json</code> in this repository.
-            </p>
-            <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx"
-                style="width:100%; padding:10px; border:1px solid #dadce0; border-radius:4px; margin-bottom:10px;">
-            <input type="text" id="gh-repo" placeholder="username/repo-name" value="Akhilesh2220/prep"
+            <p style="font-size:0.9rem; color:#5f6368; margin-bottom:16px;">Enter a <strong>GitHub Personal
+                    Access Token</strong>(Classic) with <code>repo</code>scope to sync your progress to
+                <code>progress.json</code>in this repository.
+            </p><input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx"
+                style="width:100%; padding:10px; border:1px solid #dadce0; border-radius:4px; margin-bottom:10px;"><input
+                type="text" id="gh-repo" placeholder="username/repo-name"
                 style="width:100%; padding:10px; border:1px solid #dadce0; border-radius:4px; margin-bottom:20px;">
-            <div style="text-align:right;">
-                <button class="btn" id="btn-cancel">Cancel</button>
-                <button class="btn btn-primary" id="btn-save-token">Save & Sync</button>
-            </div>
+            <div style="text-align:right;"><button class="btn" id="btn-cancel">Cancel</button><button
+                    class="btn btn-primary" id="btn-save-token">Save & Sync</button></div>
         </div>
     </div>
-
     <footer>
-        <p>Keep going. Google is waiting! 🚀</p>
+        <p>Keep going. Google is waiting ! | <span id="countdown">Calculating...</span></p>
     </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- SYNC CONFIG ---
+    <script>document.addEventListener('DOMContentLoaded', () => {
+            // --- SYNC & DATE CONFIG ---
             const REPO_FILE_PATH = 'progress.json';
             let GITHUB_TOKEN = localStorage.getItem('gh_token');
-            let GITHUB_REPO = localStorage.getItem('gh_repo') || 'Akhilesh2220/prep';
-            let fileSha = null; // Needed for update API
+            let GITHUB_REPO = localStorage.getItem('gh_repo');
+            let fileSha = null;
             let syncDebounceTimer = null;
+            let startDate = localStorage.getItem('start_date') || getDefaultStartDate();
 
             // UI Refs
+            const picker = document.getElementById('start-date-picker');
+            const dateTrigger = document.getElementById('date-trigger');
+            picker.value = startDate;
+
+            // Click the date display to open date picker
+            dateTrigger.addEventListener('click', () => {
+                picker.showPicker();
+            });
+
+            picker.addEventListener('change', (e) => {
+                startDate = e.target.value;
+                localStorage.setItem('start_date', startDate);
+                updateLayout(startDate); // Update all dynamic elements
+                saveToGitHub(); // Sync new date preference
+            });
+
+            // Initialize layout
+            updateLayout(startDate);
+
             const btnSettings = document.getElementById('btn-settings');
             const modal = document.getElementById('sync-modal');
             const btnCancel = document.getElementById('btn-cancel');
@@ -1042,12 +1232,14 @@
             btnSettings.addEventListener('click', () => {
                 modal.style.display = 'flex';
                 inputToken.value = GITHUB_TOKEN || '';
-                inputRepo.value = GITHUB_REPO || 'Akhilesh2220/prep';
+                inputRepo.value = GITHUB_REPO || '';
             });
             btnCancel.addEventListener('click', () => modal.style.display = 'none');
+
             btnSaveToken.addEventListener('click', () => {
                 const token = inputToken.value.trim();
                 const repo = inputRepo.value.trim();
+
                 if (token && repo) {
                     localStorage.setItem('gh_token', token);
                     localStorage.setItem('gh_repo', repo);
@@ -1056,7 +1248,9 @@
                     modal.style.display = 'none';
                     statusIndicator.innerText = "🟡";
                     fetchFromGitHub();
-                } else {
+                }
+
+                else {
                     alert("Please enter both Token and Repo name.");
                 }
             });
@@ -1065,6 +1259,7 @@
 
             async function fetchFromGitHub() {
                 if (!GITHUB_TOKEN) return;
+
                 try {
                     const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${REPO_FILE_PATH}`, {
                         headers: {
@@ -1074,7 +1269,6 @@
                     });
 
                     if (response.status === 404) {
-                        // File doesn't exist yet, create it with local data
                         console.log("File not found, creating initial cloud file...");
                         saveToGitHub(true);
                         statusIndicator.innerText = "🟢";
@@ -1085,12 +1279,31 @@
 
                     const data = await response.json();
                     fileSha = data.sha;
+
                     const content = atob(data.content); // Decode Base64
-                    const cloudProgress = JSON.parse(content);
+                    let cloudData;
+                    try {
+                        cloudData = JSON.parse(content);
+                    } catch (e) {
+                        console.error("JSON Parse Error", e);
+                        return;
+                    }
 
-                    applyCloudProgress(cloudProgress);
+                    // Handle Schema Migration (Array -> Object)
+                    if (Array.isArray(cloudData)) {
+                        // Legacy format: just checkbox IDs
+                        applyCloudProgress(cloudData);
+                    } else if (typeof cloudData === 'object') {
+                        // V5 format: { checks: [], startDate: "YYYY-MM-DD" }
+                        applyCloudProgress(cloudData.checks || []);
+                        if (cloudData.startDate) {
+                            startDate = cloudData.startDate;
+                            localStorage.setItem('start_date', startDate);
+                            picker.value = startDate;
+                            updateLayout(startDate); // Update everything including rail/headers
+                        }
+                    }
                     statusIndicator.innerText = "🟢";
-
                 } catch (e) {
                     console.error("Sync Error:", e);
                     statusIndicator.innerText = "🔴";
@@ -1102,13 +1315,20 @@
 
                 // Gather all checked IDs
                 const checkedIds = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.id);
-                const contentJson = JSON.stringify(checkedIds);
+
+                // V5 Payload: Object with checks AND start date
+                const payload = {
+                    checks: checkedIds,
+                    startDate: startDate
+                };
+
+                const contentJson = JSON.stringify(payload);
                 const contentBase64 = btoa(contentJson);
 
                 const body = {
                     message: "Update progress",
                     content: contentBase64,
-                    ...(fileSha ? { sha: fileSha } : {}) // SHA needed if updating
+                    ...(fileSha ? { sha: fileSha } : {})
                 };
 
                 const doCall = async () => {
@@ -1123,6 +1343,7 @@
                             },
                             body: JSON.stringify(body)
                         });
+
                         if (response.ok) {
                             const data = await response.json();
                             fileSha = data.content.sha; // Update SHA for next write
@@ -1133,8 +1354,6 @@
                     } catch (e) {
                         console.error("Save Error:", e);
                         statusIndicator.innerText = "🔴";
-                        // If SHA mismatch (409 conflict), simpler to just let next fetch sync it, or user refresh
-                        // For a personal tool, this "Last Write Wins" is usually okayish
                     }
                 };
 
@@ -1151,6 +1370,7 @@
 
                 document.querySelectorAll('input[type="checkbox"]').forEach(box => {
                     const shouldCheck = cloudIds.includes(box.id);
+
                     if (box.checked !== shouldCheck) {
                         box.checked = shouldCheck;
                         toggleStrikethrough(box);
@@ -1166,6 +1386,7 @@
 
             checkboxes.forEach(box => {
                 const savedState = localStorage.getItem(box.id);
+
                 if (savedState === 'true') {
                     box.checked = true;
                     toggleStrikethrough(box);
@@ -1175,6 +1396,7 @@
                     localStorage.setItem(box.id, box.checked);
                     toggleStrikethrough(box);
                     updateProgress();
+                    updateGlobalProgressBar(); // Update global left progress bar
                     saveToGitHub(); // Trigger cloud sync
                 });
             });
@@ -1183,9 +1405,12 @@
 
             function toggleStrikethrough(checkbox) {
                 const taskContent = checkbox.closest('.task-item').querySelector('.task-name');
+
                 if (checkbox.checked) {
                     taskContent.classList.add('strikethrough');
-                } else {
+                }
+
+                else {
                     taskContent.classList.remove('strikethrough');
                 }
             }
@@ -1194,15 +1419,19 @@
                 const totalBoxes = checkboxes.length;
                 const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked').length;
                 const percent = Math.round((checkedBoxes / totalBoxes) * 100);
+
                 document.getElementById('total-progress').innerText = `${percent}%`;
 
                 const months = document.querySelectorAll('.card[id^="month-"]');
+
                 months.forEach(month => {
                     const monthBoxes = month.querySelectorAll('input[type="checkbox"]');
                     const monthChecked = month.querySelectorAll('input[type="checkbox"]:checked');
                     const indicator = month.querySelector('.progress-indicator');
+
                     if (indicator && monthBoxes.length > 0) {
-                        indicator.innerText = `${monthChecked.length}/${monthBoxes.length} Done`;
+                        indicator.innerText = `${monthChecked.length}/${monthBoxes.length} Tasks`;
+
                         if (monthChecked.length === monthBoxes.length) {
                             indicator.style.color = 'var(--google-green)';
                             indicator.innerHTML += ' ✅';
@@ -1218,45 +1447,23 @@
             // 1. Digital Clock
             function updateTime() {
                 const now = new Date();
-                document.getElementById('digital-clock').innerText = now.toLocaleTimeString('en-US', { hour12: false });
-                document.getElementById('date-today').innerText = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                document.getElementById('digital-clock').innerText = now.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+
+                document.getElementById('date-today').innerText = now.toLocaleDateString('en-US', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
             }
+
             setInterval(updateTime, 1000);
             updateTime();
 
-            // 2. Stopwatch
-            let swInterval;
-            let swSeconds = 0;
-            const swDisplay = document.getElementById('stopwatch');
 
-            function formatTime(totalSeconds) {
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-                return [hours, minutes, seconds]
-                    .map(v => v.toString().padStart(2, '0'))
-                    .join(':');
-            }
-
-            document.getElementById('sw-start').addEventListener('click', () => {
-                if (swInterval) return;
-                swInterval = setInterval(() => {
-                    swSeconds++;
-                    swDisplay.innerText = formatTime(swSeconds);
-                }, 1000);
-            });
-
-            document.getElementById('sw-stop').addEventListener('click', () => {
-                clearInterval(swInterval);
-                swInterval = null;
-            });
-
-            document.getElementById('sw-reset').addEventListener('click', () => {
-                clearInterval(swInterval);
-                swInterval = null;
-                swSeconds = 0;
-                swDisplay.innerText = "00:00:00";
-            });
 
             // 3. Simple Monthly Calendar
             function renderCalendar() {
@@ -1267,6 +1474,7 @@
 
                 // Headers
                 const daysShort = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
                 daysShort.forEach(d => {
                     const el = document.createElement('div');
                     el.className = 'cal-day-name';
@@ -1276,6 +1484,7 @@
 
                 // Empty slots for start of month
                 const firstDayIndex = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+
                 for (let i = 0; i < firstDayIndex; i++) {
                     grid.appendChild(document.createElement('div'));
                 }
@@ -1289,11 +1498,151 @@
                     grid.appendChild(el);
                 }
             }
+
             renderCalendar();
+
+            // --- DATE HELPERS ---
+            function getDefaultStartDate() {
+                // Default to February 1st, 2026
+                return '2026-02-01';
+            }
+
+            function updateLayout(startStr) {
+                if (!startStr) return;
+                updateDateRangeDisplay(startStr);
+                updateMonthLabels(startStr);
+                updateWeekLabels(startStr);
+                updateCountdown(startStr);
+                updateGlobalProgressBar();
+            }
+
+            function updateDateRangeDisplay(startStr) {
+                const start = new Date(startStr);
+                // Format start date as "01 Feb"
+                const sDay = String(start.getDate()).padStart(2, '0');
+                const sMonth = start.toLocaleDateString('en-US', { month: 'short' });
+                document.getElementById('start-date-display').innerText = `${sDay} ${sMonth}`;
+
+                // Calculate and format end date as "31 Jul"
+                const end = new Date(start);
+                end.setMonth(end.getMonth() + 6);
+                end.setDate(end.getDate() - 1);
+                const eDay = String(end.getDate()).padStart(2, '0');
+                const eMonth = end.toLocaleDateString('en-US', { month: 'short' });
+                document.getElementById('end-date-display').innerText = `${eDay} ${eMonth}`;
+            }
+
+            function updateGlobalProgressBar() {
+                const totalBoxes = document.querySelectorAll('input[type="checkbox"]').length;
+                const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked').length;
+                const percent = totalBoxes > 0 ? (checkedBoxes / totalBoxes) * 100 : 0;
+                document.getElementById('global-progress-bar').style.height = `${percent}%`;
+            }
+
+            function updateMonthLabels(startStr) {
+                if (!startStr) return;
+                const start = new Date(startStr);
+                const labels = document.querySelectorAll('.dynamic-month');
+                labels.forEach(span => {
+                    const offset = parseInt(span.getAttribute('data-offset'));
+                    const mDate = new Date(start.getFullYear(), start.getMonth() + offset, 1);
+                    span.innerText = mDate.toLocaleDateString('en-US', { month: 'long' });
+                });
+            }
+
+            function updateWeekLabels(startStr) {
+                if (!startStr) return;
+                const start = new Date(startStr);
+                const labels = document.querySelectorAll('.week-title');
+
+                labels.forEach(span => {
+                    const monthOffset = parseInt(span.getAttribute('data-month-offset'));
+                    const weekIndex = parseInt(span.getAttribute('data-week-index'));
+
+                    // New logic using start-day and end-day attributes
+                    const startDay = parseInt(span.getAttribute('data-start-day'));
+                    const endDay = parseInt(span.getAttribute('data-end-day'));
+
+                    // Calculate Start Date for this Item
+                    const mStart = new Date(start.getFullYear(), start.getMonth() + monthOffset, 1);
+
+                    // Set Specific Start Day
+                    const wStart = new Date(mStart);
+                    wStart.setDate(startDay);
+
+                    // Set Specific End Day
+                    const wEnd = new Date(mStart);
+                    wEnd.setDate(endDay);
+
+                    // Format
+                    const sMonth = wStart.toLocaleDateString('en-US', { month: 'short' });
+                    const sDay = wStart.getDate();
+                    const eMonth = wEnd.toLocaleDateString('en-US', { month: 'short' });
+                    const eDay = wEnd.getDate();
+
+                    let dateRange = `${sMonth} ${sDay}-${eDay}`;
+                    if (sMonth !== eMonth) dateRange = `${sMonth} ${sDay} - ${eMonth} ${eDay}`;
+
+                    // If it's a standard week (Month 1/2), show "Week X", otherwise just date range?
+                    // The existing HTML text has "Week X" for standard ones. 
+                    // Let's preserve "Week X" if the data-week-index is 1-4 and it's a 7-day-ish thing, 
+                    // BUT for Month 3/4 where it's "Apr 1-10", we might not want "Week 1".
+                    // Actually the current HTML for Month 3 has "Week 1 (Apr 1-10)" in some places or just "Apr 1-10".
+                    // Let's assume if it has data-week-index, we prepend "Week X".
+                    // Wait, Month 3 currently says: <span class="week-title">Apr 1-10</span>. 
+                    // My previous edit ADDED data-week-index to them.
+
+                    // Let's check if the original text started with "Week".
+                    // Simpler: If data-week-index is present, we put "Week i (Date)".
+                    // EXCEPT for Month 3+ where we might want just "Date".
+                    // Let's look at the span innerText. It will be replaced.
+                    // Let's just standardise: "Week X (Date)" for everyone? 
+                    // No, "Apr 1-10" looks better for 10-day sprints.
+
+                    // Heuristic: If the duration (end-start) is > 8 days, don't show "Week X".
+                    const duration = endDay - startDay;
+
+                    if (duration <= 8) {
+                        span.innerText = `Week ${weekIndex} (${dateRange})`;
+                    } else {
+                        span.innerText = `${dateRange}`;
+                    }
+                });
+            }
+
+            function updateCountdown(startStr) {
+                if (!startStr) return;
+                const start = new Date(startStr);
+
+                // End Date = Start + 6 months - 1 day
+                const end = new Date(start);
+                end.setMonth(end.getMonth() + 6);
+                end.setDate(end.getDate() - 1);
+
+                const today = new Date();
+
+                // Calculate difference in time
+                const diffTime = end - today;
+
+                // Calculate difference in days (ceil to include partial current day)
+                let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                const countdownEl = document.getElementById('countdown');
+
+                if (diffDays > 0) {
+                    countdownEl.innerText = `${diffDays} days to go`;
+                } else if (diffDays === 0) {
+                    countdownEl.innerText = `Last day!`;
+                } else {
+                    countdownEl.innerText = `Completed`;
+                }
+            }
+
+            // Init Labels
+            updateLayout(startDate);
 
         });
     </script>
-
 </body>
 
 </html>
